@@ -20,6 +20,7 @@ type Stage = "opening" | "boy" | "boy-detail" | "boy-confirmed" | "girl" | "girl
 type Reaction = "correct" | "wrong" | null;
 
 const assets = {
+  crocodile: "/campaign/crocodile.png",
   football: "/campaign/football.png",
   globe: "/campaign/globe.png",
   peacock: "/campaign/peacock.png",
@@ -60,32 +61,20 @@ function CampaignButton({ children, onClick, secondary = false }: { children: Re
   );
 }
 
-function CrocodileMark({ large = false }: { large?: boolean }) {
-  return (
-    <svg className={large ? "candidate-mark mark-large" : "candidate-mark"} viewBox="0 0 180 110" role="img" aria-label="Original crocodile campaign symbol">
-      <path d="M15 58c12-21 29-33 53-36 17-2 31 3 45 13l39 3 15 12-18 6 14 11-45 3c-13 14-29 21-49 20-24-1-42-12-54-32Z" fill="currentColor"/>
-      <path d="M108 51h47M116 62h40" fill="none" stroke="var(--background)" strokeWidth="4" strokeLinecap="round"/>
-      <circle cx="107" cy="42" r="4.5" fill="var(--background)"/>
-      <path d="M47 35 33 15M68 30 61 8M45 82l-12 16M70 88l-5 14M89 85l10 13" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round"/>
-      <path d="m18 56-12-8m13 18L5 73" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
-    </svg>
-  );
-}
-
 function ImageMark({ src, alt, fallback }: { src: string; alt: string; fallback: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) return <span className="image-fallback" role="img" aria-label={alt}>{fallback}</span>;
   return <img className="candidate-image" src={src} alt={alt} onError={() => setFailed(true)} draggable={false} />;
 }
 
-type CandidateProps = { name: string; label: string; image?: string; fallback?: string; preferred?: boolean; crocodile?: boolean; onClick: () => void };
+type CandidateProps = { name: string; label: string; image: string; fallback?: string; preferred?: boolean; onClick: () => void };
 
-function CandidateCard({ name, label, image, fallback = "★", preferred, crocodile, onClick }: CandidateProps) {
+function CandidateCard({ name, label, image, fallback = "★", preferred, onClick }: CandidateProps) {
   return (
     <button className={`candidate-card${preferred ? " candidate-card-preferred" : ""}`} onClick={onClick} type="button">
       {preferred && <span className="preferred-pill">Campaign pick</span>}
       <div className="candidate-visual">
-        {crocodile ? <CrocodileMark /> : image ? <ImageMark src={image} alt={`${label} symbol`} fallback={fallback} /> : null}
+        <ImageMark src={image} alt={`${label} symbol`} fallback={fallback} />
       </div>
       <div className="candidate-copy">
         <span className="candidate-label">{label}</span>
@@ -113,7 +102,7 @@ function ReactionScreen({ correct, kind, onBack, onChoose }: { correct: boolean;
       <div className={`reaction-icon ${correct ? "check-burst" : "x-impact"}`}>
         {correct ? <Check size={82} strokeWidth={2.5} /> : <X size={92} strokeWidth={2.8} />}
       </div>
-      {correct && <div className="focus-mark">{isBoy ? <CrocodileMark large /> : <ImageMark src={assets.peacock} alt="Peacock symbol" fallback="🦚" />}</div>}
+      {correct && <div className="focus-mark"><ImageMark src={isBoy ? assets.crocodile : assets.peacock} alt={`${choice} symbol`} fallback={isBoy ? "🐊" : "🦚"} /></div>}
       <p className="eyebrow">{correct ? `${choice} energy detected` : "Plot twist"}</p>
       <h1>{correct ? "Excellent choice." : "Not so fast."}</h1>
       <p className="reaction-lead">{correct ? `${choice} selected` : isBoy ? "Interesting choice… but the Crocodile department has submitted a very enthusiastic counterargument." : "A bold tap. The Peacock campaign has requested one tiny, very sparkly reconsideration."}</p>
@@ -147,7 +136,7 @@ function SelectionScreen({ kind, choose }: { kind: "boy" | "girl"; choose: (corr
       </header>
       <div className={`candidate-grid ${isBoy ? "three-up" : "two-up"}`}>
         {isBoy ? <>
-          <CandidateCard name="Muhammad Fasih Ur Rehman" label="Crocodile" preferred crocodile onClick={() => choose(true)} />
+          <CandidateCard name="Muhammad Fasih Ur Rehman" label="Crocodile" preferred image={assets.crocodile} fallback="🐊" onClick={() => choose(true)} />
           <CandidateCard name="Abu Bakr" label="Football" image={assets.football} fallback="⚽" onClick={() => choose(false)} />
           <CandidateCard name="Muhammad Qamar" label="Globe" image={assets.globe} fallback="🌍" onClick={() => choose(false)} />
         </> : <>
@@ -166,7 +155,7 @@ function FinalScreen() {
       <p className="eyebrow">Pre-elections complete</p>
       <h1>Your choices<br />have been made.</h1>
       <div className="final-choices">
-        <div className="final-choice"><CrocodileMark /><div><span>Crocodile</span><strong>Muhammad Fasih Ur Rehman</strong></div><Check size={26} /></div>
+        <div className="final-choice"><ImageMark src={assets.crocodile} alt="Crocodile symbol" fallback="🐊" /><div><span>Crocodile</span><strong>Muhammad Fasih Ur Rehman</strong></div><Check size={26} /></div>
         <div className="final-choice"><ImageMark src={assets.peacock} alt="Peacock symbol" fallback="🦚" /><div><span>Peacock</span><strong>Azla</strong></div><Check size={26} /></div>
       </div>
       <p className="closing-line">Two strong choices. One brilliantly stylish finish.</p>
